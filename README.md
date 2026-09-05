@@ -1,96 +1,48 @@
-# LOVEFLIX ❤️
+# Assets
 
-A personal, Netflix-style static site — a "Who's watching?" profile screen that
-opens into a browse page full of our memories.
+These are the files the site currently uses. Everything is wired up in
+[`src/content/site.ts`](../src/content/site.ts) — change a filename or caption
+there and the site follows. Nothing is hardcoded in components.
 
-Built with React + TypeScript + Vite, Tailwind CSS v4 and shadcn/ui, following
-the design system in [DESIGN.md](DESIGN.md).
+## In use right now
 
-## Run it
+| File | Used for |
+|---|---|
+| `her.jpg` | "My Girl ✨" profile picture |
+| `him.jpg` | "Handsome Boy" profile picture |
+| `5.jpg` | Hero / billboard background + Episode 1 poster |
+| `6.jpg` | Memory — Shabu Date Night 🍣 |
+| `7.jpg` | Memory — Little Flower Girl 🌿 + Episode 2 poster |
+| `8.jpg` | Memory — Sushi With My Love 🍥 |
+| `9.jpg` | Memory — Car Wash Cutie 🚗💦 |
+| `tiktok.mp3` | Music on the intro screen |
+| `song.mp3` | Music on the main page (fades in after choosing a profile) |
 
-```bash
-npm install
-npm run dev      # http://localhost:5173
-```
+## Two things worth doing
 
-```bash
-npm run build    # production build into dist/
-npm run preview  # serve the production build
-```
+**1. Rewrite the captions.** I guessed them from the photos. The real ones are
+yours — edit `memories` in `src/content/site.ts`.
 
-## The flow
+**2. Add videos (optional).** The "Episodes of Us" rows currently show a still
+photo, and tapping one opens it full-screen. To make them real playable clips:
 
-1. **Intro** — a black screen; tap anywhere and `LOVEFLIX` reveals letter by
-   letter with the Netflix loading spinner, then fades away. Music starts here
-   (the tap is the only moment browsers allow audio to begin).
-2. **Who's watching?** — two profiles. Picking one cross-fades the music into
-   `song.mp3` and takes you to the browse page.
-3. **Browse** — hero billboard with Play / More Info, a horizontally scrolling
-   "Trending Memories" row, and the "Episodes of Us" list. Photos open
-   full-screen; the ⓘ button opens the love note.
+1. Drop an `.mp4` in this folder, e.g. `6.mp4`.
+2. In `src/content/site.ts`, uncomment the `video:` line on that episode:
+   ```ts
+   {
+     id: "e1",
+     title: "The Beginning",
+     poster: "/5.jpg",
+     video: "/6.mp4",   // ← uncomment this
+   }
+   ```
 
-## Making it yours
+The row thumbnail then becomes a silent looping preview and clicking opens a
+video player, exactly like the reference site.
 
-**Everything you'd want to change lives in one file:
-[`src/content/site.ts`](src/content/site.ts)** — profile names, the hero title
-and synopsis, memory captions, episode titles, and the love note. No component
-holds hardcoded content.
+## Tips
 
-Photos, videos and music go in [`public/`](public/) — see
-[`public/README.md`](public/README.md) for what each file is used for and how to
-add video episodes.
-
-## Structure
-
-```
-src/
-  content/site.ts          all copy + asset paths (edit this)
-  context/
-    ProfileContext.tsx     which profile is watching (sessionStorage-backed)
-    MusicContext.tsx       one <audio> element, survives route changes
-  routes/
-    Landing.tsx            intro + "Who's watching?"
-    Browse.tsx             the main page
-  components/
-    intro/                 the LOVEFLIX letter-reveal overlay
-    profiles/              profile picker
-    layout/                navbar (hides on scroll), music toggle
-    home/                  hero, memory row, episode list
-    modals/                info note, video player, photo lightbox
-    motion/                Reveal / RevealGroup scroll-in wrappers
-    ui/                    shadcn primitives (button, animated dialog)
-  lib/motion.ts            easing, durations and shared variants
-  index.css                design tokens from DESIGN.md
-```
-
-## Deploying
-
-Push to GitHub and import the repo on [Vercel](https://vercel.com) — it detects
-Vite automatically. [`vercel.json`](vercel.json) already contains the SPA rewrite
-so `/browse` works on a hard refresh.
-
-## Motion
-
-All timing and easing lives in [`src/lib/motion.ts`](src/lib/motion.ts) so the
-whole site moves as one piece. What is animated:
-
-- **Intro** — the black screen lifts away (fade + scale + blur) instead of cutting.
-- **Profile picker** — heading and avatars stagger in; the one you pick floats to
-  the centre and grows while the music cross-fades.
-- **Hero** — content staggers in on load, then the artwork parallaxes and the
-  text fades as you scroll past it.
-- **Rows** — section headings and cards rise into view as you reach them, one
-  after another. Cards lift on hover; episode rows slide right.
-- **Opening a photo or video** — the thumbnail itself grows into the full-size
-  view (a shared `layoutId`), rather than a new panel appearing over it.
-- **Closing** — dialogs animate out properly; Radix would normally unmount them
-  instantly, so `AnimatedDialog` hands the unmount to `AnimatePresence`.
-
-Everything above is disabled automatically for anyone with
-`prefers-reduced-motion: reduce` set.
-
-## Notes
-
-- A missing asset never breaks the page; a coloured placeholder shows instead.
-- The intro plays once per browser session, so a refresh doesn't replay it.
-- Opening `/browse` without picking a profile redirects back to the start.
+- A missing file never breaks the page — a coloured placeholder shows instead.
+- Keep videos under ~10 MB each so it loads fast on mobile data.
+- `5.jpg` is a portrait photo used as a wide hero, so it crops tight on desktop.
+  A landscape shot (~1920×1080) will look better if you have one.
